@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <script src="/static/js/vue.min.js"></script>
+
+    <div id="app" class="ui container">
+        <div class="ui form">
+
+            <div class="field">
+                <label for="">问卷标题</label>
+                <input type="text" v-model="paper.title">
+            </div>
+            <div class="field">
+                <label for="">简介</label>
+                <textarea v-model="paper.description"></textarea>
+            </div>
+
+            <div class="ui buttons">
+                <button class="ui square button blue" @click="addQuestion">添加问题</button>
+                <button class="ui square button green" @click="save">保存</button>
+            </div>
+
+            <br><br>
+
+            <div class="list">
+                <fieldset class="item link ui segment field" v-for="q, i in paper.question" :id="i">
+                    <label for=""> [[ i + 1]]. </label>
+
+                    <div class="three fields">
+                        <div class="field">
+                            <input v-model="q.text">
+                        </div>
+                        <div class="field">
+                            <select v-model="q.kind">
+                                <option value="radio">单选</option>
+                                <option value="checkbox">多选</option>
+                                <option value="text">文本（单行）</option>
+                                <option value="textarea">文本（多行）</option>
+                                <option value="integer">数字（整数）</option>
+                                <option value="float">数字（小数）</option>
+                                <option value="rate">评分</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <button @click="delQuestion(i)" class="ui icon button red">
+                                <i class="trash icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <div class="three fields">
+                            <div class="field">
+                                <label for=""> 前置条件 </label>
+                                <input type="checkbox" v-model="q.conditional">
+                            </div>
+
+                            <div class="field" v-if="q.conditional">
+                                <label for=""> 问题 </label>
+                                <select v-model="q.condition">
+                                    <option v-for="q_if, q_if_i in paper.question" v-if="q_if_i != i" :value="q_if_i">问题[[ q_if_i + 1]] - [[ q_if.text ]]</option>
+                                </select>
+                            </div>
+
+                            <div class="field" v-if="q.conditional && q.condition != null">
+                                <label for="">选项</label>
+                                <select v-model="q.condition_value">
+                                    <option v-for="opt_if, opt_if_i in paper.question[q.condition].options" :value="opt_if_i">选项[[opt_if_i + 1]] - [[ opt_if.text ]]</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="q.kind == 'radio' || q.kind == 'checkbox'" class="field">
+                        <div v-for="opt, oi in q.options" :id="oi" class="field">
+                            <input type="text" v-model="opt.text">
+                        </div>
+                        <div class="field">
+                            <button class="ui labeled button" @click="addOpt(i)"><i class="add icon"></i></button>
+                        </div>
+                    </div>
+
+                    <div v-if="q.kind == 'rate'" class="field">
+                        <div>
+                            <label for="">最大评分等级</label>
+                            <input type="number" v-model="q.max" max="10" min="5" value="5" required>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        let app = new Vue({
+            delimiters: ['[[', ']]'],
+            el: '#app',
+            data: {
+                paper: {
+                    title: "",
+                    description: "",
+                    question: [],
+                }
+            },
+            methods: {
+                addQuestion() {
+                    this.paper.question.push({
+                        text: '',
+                        kind: 'radio',
+                        options: [],
+                    });
+                },
+                addOpt(qIndex) {
+                    console.log("add opt")
+                    let q = this.paper.question[qIndex];
+                    if( q.options == null) {
+                        q.options = [];
+                    }
+                    q.options.push({ text: '', });
+                    Vue.set(this.paper.question, qIndex, q);
+                },
+                delQuestion(qIndex) {
+                    let newQuestion = [];
+                    for(let i = 0; i < this.paper.question.length; i++) {
+                        if(i !== qIndex) newQuestion.push(this.paper.question[i]);
+                    }
+                    this.paper.question = newQuestion;
+                },
+                async save() {
+                    console.log(JSON.stringify(this.paper));
+                    let resp = await fetch("", {
+                        method: "POST",
+                        body: JSON.stringify(this.paper),
+                    });
+                    let questionnaire = await resp.json();
+                    window.location = '/share/' + questionnaire.id;
+                }
+            }
+        });
+    </script>
+{% endblock %}

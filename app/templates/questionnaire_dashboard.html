@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="ui container">
+
+        <section class="ui segment">
+
+
+            <h1>{{ questionnaire.title }}</h1>
+
+            <div>分享链接
+                <pre><a href="/papers/{{ questionnaire.id }}">http://{{ request.META.HTTP_HOST }}/papers/{{ questionnaire.id }}</a> </pre>
+            </div>
+
+
+            <div>共有{{ questionnaire.paper_set.count }}份提交</div>
+            <div>第一份问卷填写于 {{ first_paper.date }}</div>
+            <div>最后一份问卷填写于 {{ last_paper.date }}</div>
+            <div>问卷时间 {{ questionnaire.create_date }} - {{ questionnaire.deadline }}</div>
+
+        </section>
+
+        <br>
+        <section>
+            {% for q in question_set %}
+                {% if q.kind == 'integer' or q.kind == 'float' %}
+                    <div class="ui segment">
+                        <div>第{{ forloop.counter }}题  <i>{{ q.text }}</i> ：</div>
+                        <div>最大答案：{{ q.max }}</div>
+                        <div>最小答案：{{ q.min }}</div>
+                        <div>答案总计：{{ q.total }}</div>
+                        <div>平均：{{ q.avg }}</div>
+                    </div>
+                {% elif q.kind == 'radio' or q.kind == "checkbox" %}
+                    <div class="ui segment">
+                        <div>第{{ forloop.counter }}题  <i>{{ q.text }}</i> ：</div>
+                        <table class="ui small table">
+
+                        <thead>
+                        <tr>
+                            <th>选项</th>
+                            <th>选择次数</th>
+                            <th>百分比</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for opt in q.opt_map %}
+                            <tr>
+                                <td> {{ opt.opt.text }} </td>
+                                <td>{{ opt.c}}</td>
+                                <td>{{ opt.percent | floatformat:2 }}%</td>
+
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+                <br>
+            {% endfor %}
+        </section>
+
+        <section>
+            <table class="ui table striped">
+                <thead>
+                <tr>
+                    <th>填写时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                {% for paper in questionnaire.paper_set.all %}
+                    <tr>
+                        <td>
+                            {{ paper.date }}
+                        </td>
+                    <td>
+                        <div class="ui small buttons">
+                            <a class="ui button" href="/papers/{{ paper.id }}/dashboard">查看</a>
+                        </div>
+                    </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </section>
+
+    </div>
+
+{% endblock %}

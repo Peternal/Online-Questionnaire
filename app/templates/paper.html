@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+    <script src="/static/js/vue.min.js"></script>
+
+    <div class="ui container">
+
+        <div id="app" class="ui form">
+            <div class="ui segment">
+                <h1>[[ paper.title ]]</h1>
+                <br>
+                <p> [[ paper.description]] </p>
+            </div>
+
+            <div class="list form">
+                <div class="item link field ui segment"
+                     v-for="q, i in paper.question"
+                     :id="i"
+                     v-show="!q.conditional || paper.question[q.condition].answer == q.condition_value">
+                    <div class="field">
+                        <h4> [[ i + 1]]. [[ q.text ]]</h4>
+                    </div>
+
+                    <div v-if="q.kind == 'radio'" class="field">
+                        <div v-for="opt, oi in q.options" :id="oi">
+                            <div class="">
+                                <input :name="`${i} ${oi}`" type="radio" :value="''+opt.id" v-model="q.answer">
+                                <label>[[opt.text]]</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="q.kind == 'checkbox'" class="field">
+                        <div v-for="opt, oi in q.options" :id="oi">
+                            <div class="">
+                                <input type="checkbox" :value="''+opt.id" v-model="q.answer">
+                                <label>[[opt.text]]</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="q.kind == 'text'" class="field">
+                        <input type="text" v-model="q.answer" required>
+                    </div>
+
+                    <div v-if="q.kind == 'textarea'" class="field">
+                        <textarea v-model="q.answer"></textarea>
+                    </div>
+
+                    <div v-if="q.kind == 'integer'" class="field">
+                        <input type="number" v-model="q.answer" required>
+                    </div>
+
+                    <div v-if="q.kind == 'float'" class="field">
+                        <input type="number" v-model="q.answer" step="0.01" required>
+                    </div>
+
+                    <div v-if="q.kind == 'rate'" class="field">
+                    <span v-for="_, i in new Array(q.max_rate).fill(0)" style="margin: 1rem;">
+                        <span>[[ i + 1]]</span>
+                        <input type="radio" :name="q.id" :value="''+i" v-model="q.answer">
+                    </span>
+                    </div>
+                    </di>
+                </div>
+
+                <div class="field">
+                    <button class="ui button blue" @click="onSubmit">提交</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block script %}
+    <script>
+        let app = new Vue({
+            delimiters: ['[[', ']]'],
+            el: '#app',
+            data: {
+                paper: {{ questionnaire_json | safe }}
+            },
+            mounted() {
+                for(let q of this.paper.question) {
+                    if(q.kind === "checkbox") {
+                        q.answer = [];
+                    }
+                }
+            },
+            methods: {
+                async onSubmit() {
+                    console.log(JSON.stringify(this.paper, null, 2));
+
+                    for (let q of this.paper.question) {
+
+                        if (q.kind === 'integer') {
+                            if( Number.isNaN(Number.parseInt(q.answer))) {
+                                alert("问题 " + q.text + " 值无效");
+                                return;
+                            }
+                        } else if (q.kind === 'float') {
+                            if( Number.isNaN(Number.parseFloat(q.answer))) {
+                                alert("问题 " + q.text + " 值无效");
+                                return;
+                            }
+                        } else {
+                            if (q.answer == null || q.answer.length === 0) {
+                                alert("问题 " + q.text + " 不能为空");
+                                return;
+                            }
+                        }
+                    }
+
+                    let answers = this.paper.question.map(it => {
+                        let a = {
+                            question: it.id,
+                            answer: it.answer,
+                        }
+                        if(a.answer instanceof Array) {
+                            a.answer = a.answer.join(',');
+                        }
+                        return a;
+                    });
+
+                    if (answers.length !== this.paper.question.length) {
+                        console.log("没有全部填写");
+                        alert("没有全部填写");
+                        return;
+                    }
+
+                    let resp = await fetch("", {
+                        method: "POST",
+                        body: JSON.stringify({
+                            'answers': answers,
+                        }),
+                    });
+                    window.document.write(await resp.text());
+                }
+            }
+        });
+
+    </script>
+{% endblock %}

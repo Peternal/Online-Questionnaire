@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+    <main class="ui container">
+
+        <section>
+            <h3>我设计的问卷</h3>
+
+            <table class="ui table">
+                <thead>
+                <tr>
+                    <th>标题</th>
+                    <th>已填写</th>
+                    <th>创建时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for questionnaire in my_questionnaire %}
+                    <tr>
+                        <td>
+                            <a href="/questionnaires/{{ questionnaire.id }}">{{ questionnaire.title }}</a>
+                        </td>
+                        <td>
+                            {{ questionnaire.paper_set.count }}
+                        </td>
+                        <td>
+                            {{ questionnaire.create_date }}
+                        </td>
+                        <td>
+                            <div class="ui small buttons">
+                                <a class="ui small button red" href="/questionnaires/{{ questionnaire.id }}/delete">删除</a>
+                                <a class="ui small button green" href="/questionnaires/{{ questionnaire.id }}">查看</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </main>
+{% endblock %}

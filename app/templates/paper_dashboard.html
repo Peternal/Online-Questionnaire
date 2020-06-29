@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="ui container">
+
+    <div class="list ui form">
+
+        {% for a in paper.answer_set.all %}
+            <div class="item field">
+                <h4>{{ forloop.counter }}. &nbsp {{ a.question.text }}</h4>
+
+            {% if a.question.kind == 'radio' %}
+                {% for opt in a.question.option_set.all %}
+                    <div class="">
+                        <input type="radio" name="{{ forloop.counter }}" {% if a.answer == opt.id|stringformat:'i' %} checked="checked" {% endif %} disabled>
+                        <label for="">{{ opt.text }}</label>
+                    </div>
+                {% endfor %}
+            {% elif a.question.kind == 'checkbox' %}
+                {% for opt in a.question.option_set.all %}
+                    <div class="">
+                        <input type="checkbox" name="{{ forloop.counter }}" {% if opt.id|stringformat:'i' in a.answer %} checked="checked" {% endif %} disabled>
+                        <label for="">{{ opt.text }}</label>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div>
+                    <p>{{ a.answer }}</p>
+                </div>
+            {% endif %}
+            </div>
+            <br>
+        {% endfor %}
+    </div>
+
+    </div>
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <div class="container segment center aligned" style="display: flex; justify-content: center;">
+
+        <div style="width: 400px;">
+            <h3>注册</h3>
+            <form class="ui form" method="post">
+                <div class="field">
+                    <label for="">用户名</label>
+                    <input name="username" type="text" required minlength="6">
+                </div>
+                <div class="field">
+                    <label for="">邮箱</label>
+                    <input name="email" type="email" required>
+                </div>
+                <div class="field">
+                    <label for="">密码</label>
+                    <input name="password" type="password" required minlength="6">
+                </div>
+                <div class="field">
+                    <label for="">再次输入密码</label>
+                    <input name="password2" type="password" required minlength="6">
+                </div>
+                <div class="field">
+                    <button class="ui blue button" type="submit">提交</button>
+                </div>
+                <div class="field">
+                    <a href="/login">前往登录</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

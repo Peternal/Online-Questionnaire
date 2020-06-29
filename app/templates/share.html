@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <div class="ui container">
+
+        {% if request.method == "GET" %}
+            <h3>设置分享方式</h3>
+            <form class="ui form" method="post">
+                <div class="field">
+                    <div class="two fields">
+                        <div class="field">
+                            <label for="">分享方式</label>
+                            <select class="ui dropdown" name="share_way">
+                                <option value="authorized">仅限注册用户，无次数限制</option>
+                                <option value="n">无需注册，可填写n次</option>
+                                <option value="n-per-day">无需注册，每天可填写n次</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label for="">次数</label>
+                            <input type="number" name="limit" min="1" value="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="">截止时间</label>
+                    <input type="datetime-local" name="deadline">
+                </div>
+
+                <div class="field">
+                    <button class="ui button blue" type="submit">保存</button>
+                </div>
+            </form>
+        {% else %}
+            <h3>保存完成</h3>
+            问卷保存完成，分享链接： <a href="/papers/{{ questionnaire.id }}">http://{{ request.META.HTTP_HOST }}/papers/{{ questionnaire.id }}</a>
+        {% endif %}
+
+    </div>
+
+    <script>
+    $(".ui .dropdown").dropdown();
+    </script>
+
+{% endblock %}
