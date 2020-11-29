@@ -1,10 +1,10 @@
-## 开发环境
+## Development Environment
 
 - Python 3.6.8  
 - Django 3.0.6 
 
 
-### 使用虚拟环境(virturalenv)
+### Using virturalenv
 
 ```
 pip install virtualenv
@@ -15,12 +15,12 @@ virtualenv venv
 
 venv\scripts\activate
 ```
-### 安装依赖
+### Install Requirements
 ```
 pip install -r requirements.txt
 ```
 
-### 使用mysql
+### Using mysql
 ```
 到papers/settings/settings.py文件
 修改
@@ -42,7 +42,7 @@ PORT默认为3306
 ```
 
 
-### 导入数据库
+### Import Database
 ```
 打开mysql，创建papers
 
@@ -51,7 +51,7 @@ create database papers default charset utf8;
 导入papers.sql
 ```
 
-### migrate
+### Migrate
 ```
 如果导入papers.sql后无法创建中文问卷，建议直接使用migrate
 
@@ -69,7 +69,7 @@ python manage.py migrate
 
 
 
-### 启动项目
+### Startup
 
 ```
 python manage.py runserver 0.0.0.0:8000
