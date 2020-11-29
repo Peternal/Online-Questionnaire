@@ -1,7 +1,7 @@
 ## User Manuals
-<div align="center">
-    <img src="https://github.com/Peternal/Online-Questionnaire/blob/master/User%20Manuals.pdf" width = "200">
-</div>
+
+[link](https://github.com/Peternal/Online-Questionnaire/blob/master/User%20Manuals.pdf)
+
 
 ## Development Environment
 
